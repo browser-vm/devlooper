@@ -3,8 +3,8 @@ import logging
 from dataclasses import dataclass
 from typing import List
 
-import openai
-from openai_function_call import OpenAISchema
+import groq
+from groq_function_call import GroqSchema
 from pydantic import Field
 from smol_dev.prompts import SMOL_DEV_SYSTEM_PROMPT
 from tenacity import (
@@ -34,7 +34,7 @@ def debug_code(
 ) -> str:
     # Not using OpenAI schema here because of JSON decoding issues.
 
-    completion = openai.ChatCompletion.create(
+    completion = groq.ChatCompletion.create(
         model=model,
         temperature=0.7,
         messages=[
@@ -84,7 +84,7 @@ def debug_code(
     return text
 
 
-class PackagesNeeded(OpenAISchema):
+class PackagesNeeded(GroqSchema):
     """A list of packages needed."""
 
     packages: List[str]
@@ -92,7 +92,7 @@ class PackagesNeeded(OpenAISchema):
 
 @retry_dec
 def initial_packages_needed(prompt: str, plan: str, package_manager: str, model: str):
-    completion = openai.ChatCompletion.create(
+    completion = groq.ChatCompletion.create(
         model=model,
         temperature=0.7,
         functions=[PackagesNeeded.openai_schema],
@@ -132,7 +132,7 @@ def diagnose_issue(
     test_stderr: str,
     model: str,
 ) -> str:
-    completion = openai.ChatCompletion.create(
+    completion = groq.ChatCompletion.create(
         model=model,
         temperature=0.7,
         messages=[
@@ -192,14 +192,14 @@ def plan_debug_actions(
     FilePath = enum.Enum("FilePaths", {path: path for path in file_paths})
 
     # Create another class so it has the right enum values.
-    class _DebugPlan(OpenAISchema):
+    class _DebugPlan(GroqSchema):
         """A plan to fix the given bugs in the program."""
 
         debug_file_paths: List[FilePath] = Field(..., description="The file paths to debug.")
         install_packages: List[str] = Field(..., description="The packages to install.")
         run_commands: List[str] = Field(..., description="Bash commands to run during image build.")
 
-    completion = openai.ChatCompletion.create(
+    completion = groq.ChatCompletion.create(
         model=model,
         temperature=0.7,
         functions=[_DebugPlan.openai_schema],

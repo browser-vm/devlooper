@@ -55,8 +55,7 @@ pip install modal
 modal token new
 ```
 
-- Create an [OpenAI](https://openai.com/) account and get an API key
-- [Create a Modal secret](https://modal.com/secrets/create) named `openai-secret`
+- [Create a Modal secret](https://modal.com/secrets/create) named `groq-secret`
 
 ### Generate!
 

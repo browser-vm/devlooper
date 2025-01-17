@@ -8,3 +8,8 @@ select = ['E', 'F', 'W', 'I']
 [tool.ruff.isort]
 combine-as-imports = true
 known-third-party = ["modal"]
+
+[project]
+dependencies = [
+    "groq-api-package"  # Replace with the actual GROQ API package name
+]

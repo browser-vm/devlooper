@@ -1,3 +1,4 @@
+```python
 import asyncio
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,7 +21,7 @@ class State:
 
     def prompt(self) -> str:
         packages: List[str] = sum(self.package_layers, [])
-        return f"{self.input_prompt}\n\nAssume you have these packages installed: {packages}"
+        return f"{self.input_prompt}\\n\\nAssume you have these packages installed: {packages}"
 
 
 app = modal.App("devlooper")
@@ -78,11 +79,11 @@ def run_in_sandbox(state: State, template: EnvTemplate) -> Tuple[int, str, str]:
 
 @app.function(
     image=devlooper_image,
-    secrets=[modal.Secret.from_name("openai-secret")],
+    secrets=[modal.Secret.from_name("groq-secret")],
     timeout=30 * 60,  # 30 minutes
 )
-async def devlooper(input_prompt: str, template_name: str, model: str = "gpt-4-1106-preview") -> State:
-    from smol_dev.prompts import generate_code, plan, specify_file_paths
+async def devlooper(input_prompt: str, template_name: str, model: str = "groq-4-1106-preview") -> State:
+    from groq_dev.prompts import generate_code, plan, specify_file_paths
 
     from .display import print_diff, print_info, print_section_header
     from .prompts import (
@@ -97,7 +98,7 @@ async def devlooper(input_prompt: str, template_name: str, model: str = "gpt-4-1
     except KeyError:
         raise ValueError(f"Unknown template name {template_name}. Must be one of {TEMPLATES.keys()}")
 
-    input_prompt = f"{input_prompt}\n{template.prompt}"
+    input_prompt = f"{input_prompt}\\n{template.prompt}"
 
     print_section_header("Generating initial plan...")
     current_plan = plan(input_prompt, model=model)
@@ -198,3 +199,4 @@ def main(
 
         print(f"Packages: {state.package_layers}")
         print(f"Image commands: {state.run_commands}")
+```
